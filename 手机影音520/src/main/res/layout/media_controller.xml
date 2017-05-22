@@ -98,6 +98,7 @@
             android:orientation="horizontal">
 
             <TextView
+                android:paddingLeft="20dp"
                 android:id="@+id/tv_current_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -117,6 +118,7 @@
                 android:thumb="@drawable/progress_thumb" />
 
             <TextView
+                android:paddingRight="20dp"
                 android:id="@+id/tv_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
