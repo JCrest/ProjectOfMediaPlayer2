@@ -54,8 +54,8 @@ public class LocalVideoFragment extends BaseFragment {
                 Intent intent = new Intent(context, SystemVideoPlayerActivity.class);
 
                 Bundle bunlder = new Bundle();
-                bunlder.putSerializable("videolist",mediaItems);
-                intent.putExtra("position",position);
+                bunlder.putSerializable("videolist", mediaItems);
+                intent.putExtra("position", position);
                 //放入Bundler
                 intent.putExtras(bunlder);
                 startActivity(intent);
@@ -70,18 +70,19 @@ public class LocalVideoFragment extends BaseFragment {
     public void initData() {
         getData();
     }
-    private Handler handler = new Handler(){
+
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
-            if(mediaItems != null && mediaItems.size() >0){
+            if (mediaItems != null && mediaItems.size() > 0) {
                 //有数据
                 tv_nodata.setVisibility(View.GONE);
                 //设置适配器
-                adapter = new LocalVideoAdapter(context,mediaItems);
+                adapter = new LocalVideoAdapter(context, mediaItems);
                 lv.setAdapter(adapter);
-            }else{
+            } else {
                 //没有数据
                 tv_nodata.setVisibility(View.VISIBLE);
             }
@@ -109,10 +110,13 @@ public class LocalVideoFragment extends BaseFragment {
                         long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Video.Media.SIZE));
                         String data = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA));
                         mediaItems.add(new MediaItem(name, duration, size, data));
-                        handler.sendEmptyMessage(0);
+
                     }
                     cursor.close();
+
                 }
+                //使用handler
+                handler.sendEmptyMessage(0);
             }
         }.start();
     }
