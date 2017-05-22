@@ -1,6 +1,7 @@
 package com.example.jiangchuanfa.projectofmediaplayer2.MiddleView.Fragment;
 
 import android.graphics.Color;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ public class LocalAudioFragment extends BaseFragment {
     private TextView textView;
     @Override
     public View initView() {
+        Log.e("TAG","LocalAudioPager-initView");
         textView = new TextView(context);
         textView.setTextSize(30);
         textView.setGravity(Gravity.CENTER);
@@ -26,6 +28,7 @@ public class LocalAudioFragment extends BaseFragment {
     @Override
     public void initData(){
         super.initData();
+        Log.e("TAG","LocalAudioPager-initData");
         textView.setText("本地音乐的内容");
     }
 }
