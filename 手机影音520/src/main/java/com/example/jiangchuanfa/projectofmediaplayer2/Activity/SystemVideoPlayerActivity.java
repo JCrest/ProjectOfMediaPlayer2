@@ -150,8 +150,6 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             setStartOrPause();
 
 
-
-
         } else if (v == btnNext) {
             setNextVideo();
             // Handle clicks for btnNext
@@ -166,16 +164,17 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             }
         }
         handler.removeMessages(HIDE_MEDIACONTROLLER);
-        handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+        handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
     }
+
     private void updateVoice(boolean isMute) {
-        if(isMute){
+        if (isMute) {
             //静音
-            am.setStreamVolume(AudioManager.STREAM_MUSIC,0,0);
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
             seekbarVoice.setProgress(0);
-        }else{
+        } else {
             //非静音
-            am.setStreamVolume(AudioManager.STREAM_MUSIC,currentVoice,0);
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, currentVoice, 0);
             seekbarVoice.setProgress(currentVoice);
         }
     }
@@ -189,7 +188,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 btnSwitchScreen.setBackgroundResource(R.drawable.btn_switch_screen_default_selector);
                 //设置视频画面为全屏显示
                 //vv.setVideoSize(screenWidth, screenHeight);
-                vv.setVideoSize(screenWidth,screenHeight);
+                vv.setVideoSize(screenWidth, screenHeight);
 
                 break;
             case DEFUALT_SCREEN:
@@ -217,6 +216,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 break;
         }
     }
+
     private void setStartOrPause() {
         if (vv.isPlaying()) {
             //暂停
@@ -296,7 +296,6 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     };
 
 
-
     //获得系统时间的具体方法
     private String getSystemTime() {
         SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
@@ -336,21 +335,21 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     }
 
     private void setButtonStatus() {
-        if(mediaItems != null && mediaItems.size() >0){
+        if (mediaItems != null && mediaItems.size() > 0) {
             //有视频播放
             setEnable(true);
 
-            if(position ==0){
+            if (position == 0) {
                 btnPre.setBackgroundResource(R.drawable.btn_pre_gray);
                 btnPre.setEnabled(false);
             }
 
-            if(position ==mediaItems.size()-1){
+            if (position == mediaItems.size() - 1) {
                 btnNext.setBackgroundResource(R.drawable.btn_next_gray);
                 btnNext.setEnabled(false);
             }
 
-        }else if(uri != null){
+        } else if (uri != null) {
             //上一个和下一个不可用点击
             setEnable(false);
         }
@@ -400,12 +399,12 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
                 // Toast.makeText(SystemVideoPlayerActivity.this, "单击了", Toast.LENGTH_SHORT).show();
-                if(isShowMediaController){
+                if (isShowMediaController) {
                     hideMediaController();
                     handler.removeMessages(HIDE_MEDIACONTROLLER);
-                }else {
+                } else {
                     showMediaController();
-                    handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+                    handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
                 }
                 return super.onSingleTapConfirmed(e);
             }
@@ -425,18 +424,53 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     }
 
 
+    //记录坐标
+    private float dowY;
+    //滑动的初始声音
+    private int mVol;
+    //滑动的最大区域
+    private float touchRang;
 
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         //把事件交给手势识别器解析
         detector.onTouchEvent(event);
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                //1.记录相关参数
+                dowY = event.getY();
+                mVol = am.getStreamVolume(AudioManager.STREAM_MUSIC);
+                touchRang = Math.min(screenHeight, screenWidth);//screenHeight
+                handler.removeMessages(HIDE_MEDIACONTROLLER);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                //2.滑动的时候来到新的位置
+                float endY = event.getY();
+                //3.计算滑动的距离
+                float distanceY = dowY - endY;
+                //原理：在屏幕滑动的距离： 滑动的总距离 = 要改变的声音： 最大声音
+                //要改变的声音 = （在屏幕滑动的距离/ 滑动的总距离）*最大声音;
+                float delta = (distanceY / touchRang) * maxVoice;
+
+
+                if (delta != 0) {
+                    //最终声音 = 原来的+ 要改变的声音
+                    int mVoice = (int) Math.min(Math.max(mVol + delta, 0), maxVoice);
+                    updateVoiceProgress(mVoice);
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
+                break;
+        }
         return super.onTouchEvent(event);
     }
 
 
 
-    private  boolean isShowMediaController = false;
+    private boolean isShowMediaController = false;
+
     private void hideMediaController() {
         llBottom.setVisibility(View.INVISIBLE);
         llTop.setVisibility(View.GONE);
@@ -444,13 +478,11 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     }
 
-    public void showMediaController(){
+    public void showMediaController() {
         llBottom.setVisibility(View.VISIBLE);
         llTop.setVisibility(View.VISIBLE);
         isShowMediaController = true;
     }
-
-
 
 
     class MyBroadCastReceiver extends BroadcastReceiver {
@@ -507,10 +539,10 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 hideMediaController();
                 //设置默认屏幕
                 setVideoType(DEFUALT_SCREEN);
-                if(vv.isPlaying()){
+                if (vv.isPlaying()) {
                     //设置暂停
                     btnStartPause.setBackgroundResource(R.drawable.btn_pause_selector);
-                }else {
+                } else {
                     btnStartPause.setBackgroundResource(R.drawable.btn_start_selector);
                 }
             }
@@ -551,7 +583,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+                handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
 
             }
         });
@@ -561,7 +593,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         seekbarVoice.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser){
+                if (fromUser) {
                     updateVoiceProgress(progress);
                 }
 
@@ -580,16 +612,16 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     }
 
 
-     //设置滑动改变声音
+    //设置滑动改变声音
     private void updateVoiceProgress(int progress) {
         currentVoice = progress;
         //真正改变声音
-        am.setStreamVolume(AudioManager.STREAM_MUSIC,currentVoice,0);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, currentVoice, 0);
         //改变进度条
         seekbarVoice.setProgress(currentVoice);
-        if(currentVoice <=0){
+        if (currentVoice <= 0) {
             isMute = true;
-        }else {
+        } else {
             isMute = false;
         }
 
