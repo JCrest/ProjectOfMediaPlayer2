@@ -41,6 +41,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private static final int PROGRESS = 0;
     //隐藏控制面板
     private static final int HIDE_MEDIACONTROLLER = 1;
+    //显示网速
+    private static final int SHOW_NET_SPEED = 2;
     //默认视频画面
     private static final int DEFUALT_SCREEN = 0;
     //全屏视频画面
@@ -85,9 +87,11 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private int maxVoice;
     //是否静音
     private boolean isMute = false;
-    private boolean isNetUri;
+    private boolean isNetUri = true;
     private LinearLayout ll_buffering;
     private TextView tv_net_speed;
+    private LinearLayout ll_loading;
+    private TextView tv_loading_net_speed;
 
     /**
      * Find the Views in the layout<br />
@@ -116,6 +120,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         vv = (VideoView) findViewById(R.id.vv);
         ll_buffering = (LinearLayout) findViewById(R.id.ll_buffering);
         tv_net_speed = (TextView) findViewById(R.id.tv_net_speed);
+        ll_loading = (LinearLayout) findViewById(R.id.ll_loading);
+        tv_loading_net_speed = (TextView) findViewById(R.id.tv_loading_net_speed);
 
 
         btnVoice.setOnClickListener(this);
@@ -129,6 +135,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         seekbarVoice.setMax(maxVoice);
         //设置当前进度
         seekbarVoice.setProgress(currentVoice);
+        //发消息开始显示网速
+        handler.sendEmptyMessage(SHOW_NET_SPEED);
     }
 
     /**
@@ -245,7 +253,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         if (position < mediaItems.size()) {
             //还是在列表范围内容
             MediaItem mediaItem = mediaItems.get(position);
-            isNetUri =  utils.isNetUri(mediaItem.getData());
+            isNetUri = utils.isNetUri(mediaItem.getData());
+            ll_loading.setVisibility(View.VISIBLE);
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
 
@@ -265,7 +274,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         if (position > 0) {
             //还是在列表范围内容
             MediaItem mediaItem = mediaItems.get(position);
-            isNetUri =  utils.isNetUri(mediaItem.getData());
+            isNetUri = utils.isNetUri(mediaItem.getData());
+            ll_loading.setVisibility(View.VISIBLE);
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
 
@@ -284,6 +294,14 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
+                case SHOW_NET_SPEED:
+                    if (isNetUri) {
+                        String netSpeed = utils.getNetSpeed(SystemVideoPlayerActivity.this);
+                        tv_loading_net_speed.setText("正在加载中...." + netSpeed);
+                        tv_net_speed.setText("正在缓冲...." + netSpeed);
+                        sendEmptyMessageDelayed(SHOW_NET_SPEED, 1000);
+                    }
+                    break;
                 case PROGRESS:
                     //得到当前进度
                     int currentPosition = vv.getCurrentPosition();
@@ -295,24 +313,23 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                     //得到系统时间(时间按照秒为基数单位放在handler中)
                     tvSystemTime.setText(getSystemTime());
                     //设置视频缓存效果
-                    if(isNetUri){
+                    if (isNetUri) {
                         int bufferPercentage = vv.getBufferPercentage();//0~100;
-                        int totalBuffer = bufferPercentage*seekbarVideo.getMax();
-                        int secondaryProgress =totalBuffer/100;
+                        int totalBuffer = bufferPercentage * seekbarVideo.getMax();
+                        int secondaryProgress = totalBuffer / 100;
                         seekbarVideo.setSecondaryProgress(secondaryProgress);
-                    }else{
+                    } else {
                         seekbarVideo.setSecondaryProgress(0);
                     }
 
 
-
-                    if(isNetUri && vv.isPlaying()){
+                    if (isNetUri && vv.isPlaying()) {
 
                         int duration = currentPosition - preCurrentPosition;
-                        if(duration <500){
+                        if (duration < 500) {
                             //卡
                             ll_buffering.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             //不卡
                             ll_buffering.setVisibility(View.GONE);
                         }
@@ -362,13 +379,13 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             MediaItem mediaItem = mediaItems.get(position);
             tvName.setText(mediaItem.getName());
             vv.setVideoPath(mediaItem.getData());
-            isNetUri =  utils.isNetUri(mediaItem.getData());
+            isNetUri = utils.isNetUri(mediaItem.getData());
 
         } else if (uri != null) {
             //设置播放地址
             vv.setVideoURI(uri);
             tvName.setText(uri.toString());
-            isNetUri =  utils.isNetUri(uri.toString());
+            isNetUri = utils.isNetUri(uri.toString());
         }
         setButtonStatus();
     }
@@ -507,7 +524,6 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     }
 
 
-
     private boolean isShowMediaController = false;
 
     private void hideMediaController() {
@@ -574,6 +590,9 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 vv.start();//开始播放
                 //开始播放时发消息开始更新播放进度
                 handler.sendEmptyMessage(PROGRESS);
+
+                //隐藏加载效果画面
+                ll_loading.setVisibility(View.GONE);
                 //默认隐藏
                 hideMediaController();
                 //设置默认屏幕
@@ -699,23 +718,23 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode ==KeyEvent.KEYCODE_VOLUME_DOWN){
+        if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             currentVoice--;
-            if(currentVoice<0) {
-                currentVoice=0;
+            if (currentVoice < 0) {
+                currentVoice = 0;
             }
             updateVoiceProgress(currentVoice);
             handler.removeMessages(HIDE_MEDIACONTROLLER);
-            handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+            handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
             return true;
-        }else  if(keyCode ==KeyEvent.KEYCODE_VOLUME_UP){
+        } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             currentVoice++;
-            if(currentVoice>maxVoice) {
-                currentVoice=maxVoice;
+            if (currentVoice > maxVoice) {
+                currentVoice = maxVoice;
             }
             updateVoiceProgress(currentVoice);
             handler.removeMessages(HIDE_MEDIACONTROLLER);
-            handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER,4000);
+            handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
             return true;
         }
         return super.onKeyDown(keyCode, event);
