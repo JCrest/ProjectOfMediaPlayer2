@@ -331,6 +331,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         } else if (uri != null) {
             //设置播放地址
             vv.setVideoURI(uri);
+            tvName.setText(uri.toString());
         }
         setButtonStatus();
     }
