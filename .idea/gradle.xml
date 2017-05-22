@@ -8,6 +8,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/vitamio" />
             <option value="$PROJECT_DIR$/手机影音520" />
           </set>
         </option>

@@ -1,1 +1,1 @@
-include ':手机影音520'
+include ':手机影音520', ':vitamio'
