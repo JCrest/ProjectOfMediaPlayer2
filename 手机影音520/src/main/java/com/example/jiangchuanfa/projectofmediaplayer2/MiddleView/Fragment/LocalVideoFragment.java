@@ -1,6 +1,7 @@
 package com.example.jiangchuanfa.projectofmediaplayer2.MiddleView.Fragment;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.jiangchuanfa.projectofmediaplayer2.Activity.SystemVideoPlayerActivity;
 import com.example.jiangchuanfa.projectofmediaplayer2.Adapter.LocalVideoAdapter;
 import com.example.jiangchuanfa.projectofmediaplayer2.DoMain.MediaItem;
 import com.example.jiangchuanfa.projectofmediaplayer2.MiddleView.BaseFragment;
@@ -45,6 +47,9 @@ public class LocalVideoFragment extends BaseFragment {
 
                 MediaItem item = adapter.getItem(position);
                 Toast.makeText(context, ""+item.toString(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(context,SystemVideoPlayerActivity.class);
+                intent.setDataAndType(Uri.parse(item.getData()),"video/*");
+                startActivity(intent);
 
 
             }

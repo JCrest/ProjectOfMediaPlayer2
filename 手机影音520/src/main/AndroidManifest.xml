@@ -21,8 +21,11 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:launchMode="singleTask"
             >
+        </activity>
 
-
+        <activity android:name=".Activity.SystemVideoPlayerActivity"
+            android:theme="@style/myScreen"
+            >
 
         </activity>
     </application>
