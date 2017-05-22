@@ -1,7 +1,6 @@
 package com.example.jiangchuanfa.projectofmediaplayer2;
 
 import android.os.Bundle;
-import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_main);
         rg_main = (RadioGroup) findViewById(R.id.rg_main);
         initFragment();
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class MyOnCheckedChangeListener implements RadioGroup.OnCheckedChangeListener {
         @Override
-        public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
             switch (checkedId) {
                 case R.id.rb_local_video:
                     position = 0;

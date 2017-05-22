@@ -24,6 +24,7 @@
         </activity>
 
         <activity android:name=".Activity.SystemVideoPlayerActivity"
+            android:screenOrientation="landscape"
             android:theme="@style/myScreen"
             >
 
