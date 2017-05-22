@@ -23,6 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_weight="1"
+                android:paddingLeft="20dp"
                 android:text="视频的名称"
                 android:textColor="@android:color/white" />
 
@@ -39,6 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
+                android:paddingRight="20dp"
                 android:text="时间"
                 android:textColor="@android:color/white" />
 
@@ -98,10 +100,10 @@
             android:orientation="horizontal">
 
             <TextView
-                android:paddingLeft="20dp"
                 android:id="@+id/tv_current_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingLeft="20dp"
                 android:text="进度"
                 android:textColor="@android:color/white" />
 
@@ -118,10 +120,10 @@
                 android:thumb="@drawable/progress_thumb" />
 
             <TextView
-                android:paddingRight="20dp"
                 android:id="@+id/tv_duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:paddingRight="20dp"
                 android:text="总时长"
                 android:textColor="@android:color/white" />
 
