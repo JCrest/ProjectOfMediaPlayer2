@@ -108,11 +108,12 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             // Handle clicks for btnSwitchPlayer
         } else if (v == btnExit) {
             // Handle clicks for btnExit
+            finish();
         } else if (v == btnPre) {
+            setPreVideo();
             // Handle clicks for btnPre
         } else if (v == btnStartPause) {
             // Handle clicks for btnStartPause
-
             if (vv.isPlaying()) {
                 //暂停
                 vv.pause();
@@ -125,10 +126,45 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 btnStartPause.setBackgroundResource(R.drawable.btn_pause_selector);
             }
         } else if (v == btnNext) {
+            setNextVideo();
             // Handle clicks for btnNext
         } else if (v == btnSwitchScreen) {
             // Handle clicks for btnSwitchScreen
         }
+    }
+
+    private void setNextVideo() {
+        position++;
+        if (position < mediaItems.size()) {
+            //还是在列表范围内容
+            MediaItem mediaItem = mediaItems.get(position);
+            vv.setVideoPath(mediaItem.getData());
+            tvName.setText(mediaItem.getName());
+
+            //设置按钮状态
+            setButtonStatus();
+
+        } else {
+            Toast.makeText(this, "退出播放器", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+
+    }
+
+    private void setPreVideo() {
+        position--;
+        if (position > 0) {
+            //还是在列表范围内容
+            MediaItem mediaItem = mediaItems.get(position);
+            vv.setVideoPath(mediaItem.getData());
+            tvName.setText(mediaItem.getName());
+
+            //设置按钮状态
+            setButtonStatus();
+        }
+
+
     }
 
     //handler消息机制发送各种消息在子线程中进行
@@ -181,23 +217,46 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     private void setData() {
 
-        if(mediaItems != null && mediaItems.size() >0){
+        if (mediaItems != null && mediaItems.size() > 0) {
 
             MediaItem mediaItem = mediaItems.get(position);
             tvName.setText(mediaItem.getName());
             vv.setVideoPath(mediaItem.getData());
 
-        }else if(uri != null){
+        } else if (uri != null) {
             //设置播放地址
             vv.setVideoURI(uri);
         }
+        setButtonStatus();
+    }
+
+    private void setButtonStatus() {
+        if(mediaItems != null && mediaItems.size() >0){
+            //有视频播放
+            setEnable(true);
+
+            if(position ==0){
+                btnPre.setBackgroundResource(R.drawable.btn_pre_gray);
+                btnPre.setEnabled(false);
+            }
+
+            if(position ==mediaItems.size()-1){
+                btnNext.setBackgroundResource(R.drawable.btn_next_gray);
+                btnNext.setEnabled(false);
+            }
+
+        }else if(uri != null){
+            //上一个和下一个不可用点击
+            setEnable(false);
+        }
+
     }
 
     private void getData() {
         //得到播放地址
         uri = getIntent().getData();
-        mediaItems  = (ArrayList<MediaItem>) getIntent().getSerializableExtra("videolist");
-        position = getIntent().getIntExtra("position",0);
+        mediaItems = (ArrayList<MediaItem>) getIntent().getSerializableExtra("videolist");
+        position = getIntent().getIntExtra("position", 0);
     }
 
     private void initData() {
@@ -258,6 +317,12 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                 vv.start();//开始播放
                 //开始播放时发消息开始更新播放进度
                 handler.sendEmptyMessage(PROGRESS);
+                if(vv.isPlaying()){
+                    //设置暂停
+                    btnStartPause.setBackgroundResource(R.drawable.btn_pause_selector);
+                }else {
+                    btnStartPause.setBackgroundResource(R.drawable.btn_start_selector);
+                }
             }
         });
 
@@ -273,8 +338,9 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
-                Toast.makeText(SystemVideoPlayerActivity.this, "视频播放完成", Toast.LENGTH_SHORT).show();
-                finish();//退出当前页面
+//                Toast.makeText(SystemVideoPlayerActivity.this, "视频播放完成", Toast.LENGTH_SHORT).show();
+//                finish();//退出当前页面
+                setNextVideo();
             }
         });
         //设置底部seekbar状态改变的监听
@@ -298,6 +364,20 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
             }
         });
 
+    }
+
+    private void setEnable(boolean b) {
+        if (b) {
+            //上一个和下一个都可以点击
+            btnPre.setBackgroundResource(R.drawable.btn_pre_selector);
+            btnNext.setBackgroundResource(R.drawable.btn_next_selector);
+        } else {
+            //上一个和下一个灰色，并且不可用点击
+            btnPre.setBackgroundResource(R.drawable.btn_pre_gray);
+            btnNext.setBackgroundResource(R.drawable.btn_next_gray);
+        }
+        btnPre.setEnabled(b);
+        btnNext.setEnabled(b);
     }
 
     //移除消息，取消广播注册
