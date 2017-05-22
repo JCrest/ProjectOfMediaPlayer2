@@ -86,6 +86,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     //是否静音
     private boolean isMute = false;
     private boolean isNetUri;
+    private LinearLayout ll_buffering;
+    private TextView tv_net_speed;
 
     /**
      * Find the Views in the layout<br />
@@ -112,6 +114,9 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
         btnNext = (Button) findViewById(R.id.btn_next);
         btnSwitchScreen = (Button) findViewById(R.id.btn_switch_screen);
         vv = (VideoView) findViewById(R.id.vv);
+        ll_buffering = (LinearLayout) findViewById(R.id.ll_buffering);
+        tv_net_speed = (TextView) findViewById(R.id.tv_net_speed);
+
 
         btnVoice.setOnClickListener(this);
         btnSwitchPlayer.setOnClickListener(this);
@@ -271,6 +276,8 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     }
 
+    private int preCurrentPosition;
+
     //handler消息机制发送各种消息在子线程中进行
     private Handler handler = new Handler() {
         @Override
@@ -297,6 +304,21 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
                         seekbarVideo.setSecondaryProgress(0);
                     }
 
+
+
+                    if(isNetUri && vv.isPlaying()){
+
+                        int duration = currentPosition - preCurrentPosition;
+                        if(duration <500){
+                            //卡
+                            ll_buffering.setVisibility(View.VISIBLE);
+                        }else{
+                            //不卡
+                            ll_buffering.setVisibility(View.GONE);
+                        }
+
+                        preCurrentPosition = currentPosition;
+                    }
 
                     //循环发消息
                     sendEmptyMessageDelayed(PROGRESS, 1000);
