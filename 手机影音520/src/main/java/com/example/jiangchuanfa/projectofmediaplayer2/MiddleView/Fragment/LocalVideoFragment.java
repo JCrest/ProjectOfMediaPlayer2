@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -11,7 +12,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.jiangchuanfa.projectofmediaplayer2.Activity.SystemVideoPlayerActivity;
 import com.example.jiangchuanfa.projectofmediaplayer2.Adapter.LocalVideoAdapter;
@@ -44,11 +44,20 @@ public class LocalVideoFragment extends BaseFragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //得到点击item对应的对象
 //                MediaItem mediaItem = mediaItems.get(position);
+//
+//                MediaItem item = adapter.getItem(position);
+//                Toast.makeText(context, ""+item.toString(), Toast.LENGTH_SHORT).show();
+//                Intent intent = new Intent(context,SystemVideoPlayerActivity.class);
+//                intent.setDataAndType(Uri.parse(item.getData()),"video/*");
 
-                MediaItem item = adapter.getItem(position);
-                Toast.makeText(context, ""+item.toString(), Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(context,SystemVideoPlayerActivity.class);
-                intent.setDataAndType(Uri.parse(item.getData()),"video/*");
+                //传递视频列表过去
+                Intent intent = new Intent(context, SystemVideoPlayerActivity.class);
+
+                Bundle bunlder = new Bundle();
+                bunlder.putSerializable("videolist",mediaItems);
+                intent.putExtra("position",position);
+                //放入Bundler
+                intent.putExtras(bunlder);
                 startActivity(intent);
 
 

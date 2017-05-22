@@ -20,10 +20,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.example.jiangchuanfa.projectofmediaplayer2.DoMain.MediaItem;
 import com.example.jiangchuanfa.projectofmediaplayer2.R;
 import com.example.jiangchuanfa.projectofmediaplayer2.Utils.Utils;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -34,6 +36,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private static final int PROGRESS = 0;
     private VideoView vv;
     private Uri uri;
+    private ArrayList<MediaItem> mediaItems;
 
     private LinearLayout llTop;
     private TextView tvName;
@@ -54,6 +57,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
     private Utils utils;
     //声明广播用来监听电量的变化
     private MyBroadCastReceiver receiver;
+    private int position;//视频列表的位置
 
     /**
      * Find the Views in the layout<br />
@@ -169,9 +173,31 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
         //得到播放地址
         uri = getIntent().getData();
+        getData();
+
         setListener();
-        //设置播放地址
-        vv.setVideoURI(uri);
+        setData();
+    }
+
+    private void setData() {
+
+        if(mediaItems != null && mediaItems.size() >0){
+
+            MediaItem mediaItem = mediaItems.get(position);
+            tvName.setText(mediaItem.getName());
+            vv.setVideoPath(mediaItem.getData());
+
+        }else if(uri != null){
+            //设置播放地址
+            vv.setVideoURI(uri);
+        }
+    }
+
+    private void getData() {
+        //得到播放地址
+        uri = getIntent().getData();
+        mediaItems  = (ArrayList<MediaItem>) getIntent().getSerializableExtra("videolist");
+        position = getIntent().getIntExtra("position",0);
     }
 
     private void initData() {
