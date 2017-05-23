@@ -756,19 +756,15 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
     private void setPreVideo() {
         position--;
-        if (position > 0) {
+        if (position >= 0) {
             //还是在列表范围内容
             MediaItem mediaItem = mediaItems.get(position);
             isNetUri = utils.isNetUri(mediaItem.getData());
             ll_loading.setVisibility(View.VISIBLE);
             vv.setVideoPath(mediaItem.getData());
             tvName.setText(mediaItem.getName());
-
-
             //设置按钮状态
             setButtonStatus();
-
-
         }
 
     }
@@ -786,13 +782,9 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
 
             //设置按钮状态
             setButtonStatus();
-
-
         } else {
             Toast.makeText(this, "退出播放器", Toast.LENGTH_SHORT).show();
             finish();
-
-
         }
 
     }
