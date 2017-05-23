@@ -142,8 +142,8 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
         vv = (VitamioVideoView) findViewById(R.id.vv);
         ll_buffering = (LinearLayout) findViewById(R.id.ll_buffering);
         tv_net_speed = (TextView) findViewById(R.id.tv_net_speed);
-        ll_loading = (LinearLayout)findViewById(R.id.ll_loading);
-        tv_loading_net_speed = (TextView)findViewById(R.id.tv_loading_net_speed);
+        ll_loading = (LinearLayout) findViewById(R.id.ll_loading);
+        tv_loading_net_speed = (TextView) findViewById(R.id.tv_loading_net_speed);
         btnVoice.setOnClickListener(this);
         btnSwitchPlayer.setOnClickListener(this);
         btnExit.setOnClickListener(this);
@@ -222,17 +222,17 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     }
 
     private void startSystemPlayer() {
-        if(vv != null){
+        if (vv != null) {
             vv.stopPlayback();
         }
         Intent intent = new Intent(this, SystemVideoPlayerActivity.class);
-        if(mediaItems != null && mediaItems.size() >0){
+        if (mediaItems != null && mediaItems.size() > 0) {
             Bundle bunlder = new Bundle();
-            bunlder.putSerializable("videolist",mediaItems);
-            intent.putExtra("position",position);
+            bunlder.putSerializable("videolist", mediaItems);
+            intent.putExtra("position", position);
             //放入Bundler
             intent.putExtras(bunlder);
-        }else if(uri != null){
+        } else if (uri != null) {
             intent.setData(uri);
         }
         startActivity(intent);
@@ -316,11 +316,11 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
             super.handleMessage(msg);
             switch (msg.what) {
                 case SHOW_NET_SPEED:
-                    if(isNetUri){
+                    if (isNetUri) {
                         String netSpeed = utils.getNetSpeed(VitamioVideoPlayerActivity.this);
-                        tv_loading_net_speed.setText("正在加载中...."+netSpeed);
-                        tv_net_speed.setText("正在缓冲...."+netSpeed);
-                        sendEmptyMessageDelayed(SHOW_NET_SPEED,1000);
+                        tv_loading_net_speed.setText("正在加载中...." + netSpeed);
+                        tv_net_speed.setText("正在缓冲...." + netSpeed);
+                        sendEmptyMessageDelayed(SHOW_NET_SPEED, 1000);
                     }
                     break;
                 case PROGRESS:
@@ -345,13 +345,13 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
                         seekbarVideo.setSecondaryProgress(0);
                     }
 
-                    if(isNetUri && vv.isPlaying()){
+                    if (isNetUri && vv.isPlaying()) {
 
                         int duration = currentPosition - preCurrentPosition;
-                        if(duration <500){
+                        if (duration < 500) {
                             //卡
                             ll_buffering.setVisibility(View.VISIBLE);
-                        }else{
+                        } else {
                             //不卡
                             ll_buffering.setVisibility(View.GONE);
                         }
@@ -718,20 +718,17 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     }
 
     private void showErrorDialog() {
-            new AlertDialog.Builder(this)
-                    .setTitle("提示")
-                    .setMessage("当前视频不可播放，请检查网络或者视频文件是否有损坏！")
-                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            finish();
-                        }
-                    })
-                    .show();
-        }
-
-
-
+        new AlertDialog.Builder(this)
+                .setTitle("提示")
+                .setMessage("当前视频不可播放，请检查网络或者视频文件是否有损坏！")
+                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .show();
+    }
 
 
     private void startVitamioPlayer() {
@@ -864,12 +861,18 @@ public class VitamioVideoPlayerActivity extends AppCompatActivity implements Vie
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
             currentVoice--;
+            if (currentVoice < 0) {
+                currentVoice = 0;
+            }
             updateVoiceProgress(currentVoice);
             handler.removeMessages(HIDE_MEDIACONTROLLER);
             handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             currentVoice++;
+            if (currentVoice > maxVoice) {
+                currentVoice = maxVoice;
+            }
             updateVoiceProgress(currentVoice);
             handler.removeMessages(HIDE_MEDIACONTROLLER);
             handler.sendEmptyMessageDelayed(HIDE_MEDIACONTROLLER, 4000);
