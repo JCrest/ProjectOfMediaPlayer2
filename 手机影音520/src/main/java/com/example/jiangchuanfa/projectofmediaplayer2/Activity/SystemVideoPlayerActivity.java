@@ -297,7 +297,7 @@ public class SystemVideoPlayerActivity extends AppCompatActivity implements View
 
     private void setPreVideo() {
         position--;
-        if (position > 0) {
+        if (position >= 0) {
             //还是在列表范围内容
             MediaItem mediaItem = mediaItems.get(position);
             isNetUri = utils.isNetUri(mediaItem.getData());
